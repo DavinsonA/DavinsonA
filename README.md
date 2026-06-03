@@ -18,7 +18,6 @@
 ![R](https://img.shields.io/badge/R-276DC3?style=flat&logo=r&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 ![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat&logo=postgresql&logoColor=white)
-![SAS](https://img.shields.io/badge/SAS-0766D1?style=flat&logo=sas&logoColor=white)
 
 **Data Science / ML**
 ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=pytorch&logoColor=white)
@@ -38,10 +37,8 @@
 
 ### Certificaciones
 
-| Certificación | Emisor | Año |
-|---|---|---|
-| Azure Data Fundamentals (DP-900) | Microsoft | 2026 |
-| Advanced SQL | HackerRank | {{año}} |
+[![DP-900](https://images.credly.com/size/50x50/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/azure-data-fundamentals-600x600.png)](https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url)
+
 
 ---
 ### Estadísticas
@@ -55,4 +52,14 @@
 
 ### Contacto
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davinson-arteaga/)
+<p align="center">
+  <a href="https://wa.me/573157032101">
+    <img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
+  </a>
+  <a href="mailto:arteagadavinson@gmail.com">
+    <img src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" />
+  </a>
+  <a href="https://linkedin.com/in/davinson-arteaga">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+</p>

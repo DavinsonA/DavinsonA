@@ -2,8 +2,8 @@
 <p align="center">Estadístico · Data Analyst · Data Scientist</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Cali-Colombia-003B49?style=flat-square" alt="ubicación" />
-  <img src="https://img.shields.io/badge/MSc%20Data%20Science-ICESI-FA4616?style=flat-square" alt="maestría" />
+  <img src="https://img.shields.io/badge/Cali-Colombia-FFCD00?style=flat-square" alt="ubicación" />
+  <img src="https://img.shields.io/badge/MSc%20Data%20Science-ICESI-5454e9?style=flat-square" alt="maestría" />
 </p>
 
 <img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=0:003B49,100:99DED7&section=header" width="100%" />

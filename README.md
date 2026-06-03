@@ -22,11 +22,14 @@
 **Data Science / ML**
 ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=pytorch&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-150458?style=flat&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)
-![Optuna](https://img.shields.io/badge/Optuna-2C5BB4?style=flat)
+![Optuna](https://img.shields.io/badge/Optuna-3860A8?style=flat&logo=optuna&logoColor=white)
 
 **BI & Viz**
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
 ![Tableau](https://img.shields.io/badge/Tableau-E97627?style=flat&logo=tableau&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=flat&logo=plotly&logoColor=white)
 
 **Infra & herramientas**
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
@@ -37,19 +40,9 @@
 
 ### Certificaciones
 
-[![DP-900](https://images.credly.com/size/50x50/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/azure-data-fundamentals-600x600.png)](https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url)
-
-
----
-### Estadísticas
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username={{usuario}}&show_icons=true&theme=tokyonight" alt="stats" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username={{usuario}}&layout=compact&theme=tokyonight" alt="langs" />
-</p>
+[![DP-900](https://images.credly.com/size/80x80/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/azure-data-fundamentals-600x600.png)](https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url)
 
 ---
-
 ### Contacto
 
 <p align="center">

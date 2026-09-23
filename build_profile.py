@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import io
 import math
 import random
-import struct
+import re
+import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 from collections import defaultdict
@@ -19,8 +22,13 @@ from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 
 ROOT = Path(__file__).resolve().parent
-ASSETS, CACHE = ROOT / "assets", ROOT / ".fonts"
-GOOGLE_FONTS = "https://raw.githubusercontent.com/google/fonts/main/ofl/"
+ASSETS, CACHE = ROOT / "assets", ROOT / ".cache"
+LOGO = ASSETS / "da-logo.svg"
+SOURCES = {
+    "font": "https://raw.githubusercontent.com/google/fonts/main/ofl/{}",
+    "si": "https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/{}.svg",
+    "lu": "https://cdn.jsdelivr.net/npm/lucide-static@1.47.0/icons/{}.svg",
+}
 
 try:
     import brotli  # noqa: F401
@@ -31,39 +39,52 @@ except ImportError:
 ABYSS = "#043f52"
 PASTEL = dict(mint="#9ce0d9", sky="#a1dafc", lavender="#d4c8fe", rose="#fabdd3", peach="#fac3a5", butter="#f6e5a4")
 THEMES = {
-    "dark": dict(bg="#0e2024", raised="#1e343a", line="#26434a", line_strong="#5a8990", dot="#1d383e",
-                 ink="#e6f2f1", overline=PASTEL["mint"], logo="da-logo-mint.png"),
-    "light": dict(bg="#f4fcfb", raised="#eef8f7", line="#d6e8e6", line_strong="#678a90", dot="#cfe6e3",
-                  ink=ABYSS, overline="#4a6a72", logo="da-logo-abyss.png"),
+    "dark": dict(bg="#0e2024", surface="#152a2f", raised="#1e343a", line="#26434a", line_strong="#5a8990",
+                 dot="#1d383e", ink="#e6f2f1", muted="#a2bfc2", accent="#a1dafc", overline=PASTEL["mint"],
+                 logo=PASTEL["mint"]),
+    "light": dict(bg="#f4fcfb", surface="#ffffff", raised="#eef8f7", line="#d6e8e6", line_strong="#678a90",
+                  dot="#cfe6e3", ink=ABYSS, muted="#4a6a72", accent="#005477", overline="#4a6a72", logo=ABYSS),
 }
 
 PROFILE = dict(
     greeting="Hola, soy Davinson",
     title="Data Scientist · AI Engineer",
-    chips=[("Cali, Colombia", "mint"), ("MSc Data Science · ICESI", "sky")],
+    tagline="Cali, Colombia · MSc Data Science, Universidad ICESI",
+    pillars=[("Analítica y BI", "peach", "lu:chart-column"),
+             ("Estadística y machine learning", "butter", "lu:sigma"),
+             ("IA generativa y agentes", "lavender", "lu:bot")],
 )
 ABOUT = [
-    "Estadístico de la Universidad del Valle; curso la Maestría en Ciencia de Datos en la Universidad ICESI.",
-    "Construyo consultas SQL avanzadas, conciliaciones financieras y pipelines de reportes automatizados sobre NetSuite (SuiteQL).",
-    "Desarrollo agentes de IA con tool use, MCP servers y RAG.",
-    "Hago consultoría independiente en análisis estadístico, BI y visualización, y modelado.",
+    "Estadístico de la Universidad del Valle y estudiante de la Maestría en Ciencia de Datos en ICESI.",
+    "Trabajo con análisis de datos, modelos de machine learning y agentes de IA.",
+    "Abierto a roles de Data Analyst, Data Scientist o AI Engineer.",
 ]
+PROJECTS: list[tuple[str, str | None, str]] = []
 STACK = [
-    ("Lenguajes", "mint", ["Python", "R", "SQL", "SAS"]),
-    ("IA y machine learning", "lavender", ["PyTorch", "scikit-learn", "Optuna"]),
-    ("Datos y plataformas", "sky", ["pandas", "NumPy", "PostgreSQL", "NetSuite"]),
-    ("BI y visualización", "peach", ["Power BI", "Tableau", "Plotly"]),
-    ("Infraestructura", None, ["Linux", "Docker", "Git"]),
+    ("Lenguajes", "mint", [("Python", "si:python"), ("SQL", "lu:database"), ("R", "si:r")]),
+    ("IA generativa", "lavender", [("MCP", "si:modelcontextprotocol"), ("Ollama", "si:ollama"), ("n8n", "si:n8n"),
+                                   ("FAISS", "lu:scan-search"), ("ChromaDB", "lu:database-zap")]),
+    ("Machine learning", "lavender", [("PyTorch", "si:pytorch"), ("scikit-learn", "si:scikitlearn"),
+                                      ("XGBoost", "lu:trees"), ("Optuna", "si:optuna")]),
+    ("Datos e integración", "sky", [("PostgreSQL", "si:postgresql"), ("BigQuery", "si:googlebigquery"),
+                                    ("NetSuite", "lu:building-2"), ("Salesforce", "lu:users"), ("pandas", "si:pandas")]),
+    ("BI y visualización", "peach", [("Power BI", "lu:chart-column"), ("Tableau", "lu:chart-area"),
+                                     ("Looker Studio", "lu:chart-pie"), ("Plotly", "si:plotly")]),
+    ("Infraestructura", None, [("Docker", "si:docker"), ("Git", "si:git"), ("Linux", "si:linux")]),
 ]
 CERTS = [
-    ("Microsoft Certified: Azure Data Fundamentals (DP-900)",
-     "https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url"),
-    ("HackerRank: SQL (Advanced)", None),
+    dict(slug="dp-900", title="Azure Data Fundamentals", issuer="Microsoft · DP-900",
+         url="https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url",
+         badge="https://images.credly.com/size/110x110/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/"
+               "azure-data-fundamentals-600x600.png",
+         icon="si:credly", pastel="sky"),
+    dict(slug="hackerrank-sql", title="SQL (Advanced)", issuer="HackerRank", url=None, badge=None,
+         icon="si:hackerrank", pastel="mint"),
 ]
 CONTACT = [
-    ("Escribir un correo", "mailto:arteagadavinson@gmail.com"),
-    ("Ver LinkedIn", "https://linkedin.com/in/davinson-arteaga"),
-    ("Abrir WhatsApp", "https://wa.me/573157032101"),
+    ("Escribir un correo", "mailto:arteagadavinson@gmail.com", "lu:mail"),
+    ("Ver LinkedIn", "https://linkedin.com/in/davinson-arteaga", "si:linkedin|lu:briefcase-business"),
+    ("Abrir WhatsApp", "https://wa.me/573157032101", "si:whatsapp"),
 ]
 
 
@@ -79,19 +100,27 @@ class Face:
         return f"'{self.family}', {self.fallback}"
 
 
+PLEX = "ibmplexsans/IBMPlexSans[wdth,wght].ttf"
 DISPLAY = Face("Space Grotesk", "spacegrotesk/SpaceGrotesk[wght].ttf", 600, "'IBM Plex Sans', system-ui, sans-serif")
-SANS_600 = Face("IBM Plex Sans", "ibmplexsans/IBMPlexSans[wdth,wght].ttf", 600, "'Segoe UI', Helvetica, Arial, sans-serif")
+SANS_400 = Face("IBM Plex Sans", PLEX, 400, "'Segoe UI', Helvetica, Arial, sans-serif")
+SANS_600 = Face("IBM Plex Sans", PLEX, 600, "'Segoe UI', Helvetica, Arial, sans-serif")
 MONO_500 = Face("IBM Plex Mono", "ibmplexmono/IBMPlexMono-Medium.ttf", 500, "ui-monospace, Menlo, Consolas, monospace")
+SVG_ROOT = re.compile(r"<svg\b([^>]*)>(.*)</svg>", re.S)
+
+
+def fetch(url: str) -> bytes:
+    path = CACHE / hashlib.sha1(url.encode()).hexdigest()[:16]
+    if not path.exists():
+        CACHE.mkdir(exist_ok=True)
+        req = urllib.request.Request(url, headers={"User-Agent": "build-profile"})
+        with urllib.request.urlopen(req, timeout=60) as r:
+            path.write_bytes(r.read())
+    return path.read_bytes()
 
 
 @lru_cache
 def instance_bytes(face: Face) -> bytes:
-    path = CACHE / Path(face.source).name
-    if not path.exists():
-        CACHE.mkdir(exist_ok=True)
-        with urllib.request.urlopen(GOOGLE_FONTS + urllib.parse.quote(face.source), timeout=60) as r:
-            path.write_bytes(r.read())
-    font = TTFont(path)
+    font = TTFont(io.BytesIO(fetch(SOURCES["font"].format(urllib.parse.quote(face.source)))))
     if "fvar" in font:
         axes = {a.axisTag for a in font["fvar"].axes}
         pins = {k: v for k, v in {"wght": face.weight, "wdth": 100}.items() if k in axes}
@@ -112,11 +141,6 @@ def text_width(face: Face, text: str, size: float, tracking: float = 0.0) -> flo
     return sum(adv[cmap.get(ord(c), ".notdef")] for c in text) * size / upm + tracking * size * max(len(text) - 1, 0)
 
 
-def cap_offset(face: Face, size: float) -> float:
-    _, _, upm, cap = metrics(face)
-    return cap * size / upm / 2
-
-
 def font_face(face: Face, text: str) -> str:
     font = TTFont(io.BytesIO(instance_bytes(face)))
     opts = Options()
@@ -128,9 +152,42 @@ def font_face(face: Face, text: str) -> str:
     font.flavor = FLAVOR
     buf = io.BytesIO()
     font.save(buf)
-    data = base64.b64encode(buf.getvalue()).decode()
     return (f"@font-face{{font-family:'{face.family}';font-weight:{face.weight};"
-            f"src:url(data:font/{FLAVOR};base64,{data}) format('{FLAVOR}')}}")
+            f"src:url(data:font/{FLAVOR};base64,{base64.b64encode(buf.getvalue()).decode()}) format('{FLAVOR}')}}")
+
+
+def parse_svg(raw: str) -> tuple[list[float], str, str]:
+    attrs, inner = SVG_ROOT.search(raw).groups()
+    inner = re.sub(r"<title>.*?</title>|<metadata>.*?</metadata>|<!--.*?-->", "", inner, flags=re.S).strip()
+    vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', attrs).group(1).replace(",", " ").split()]
+    return vb, attrs, inner
+
+
+@lru_cache
+def icon(refs: str) -> tuple[list[float], bool, str]:
+    for ref in refs.split("|"):
+        kind, name = ref.split(":", 1)
+        local = ASSETS / "icons" / f"{name}.svg"
+        try:
+            raw = local.read_text("utf-8") if local.exists() else fetch(SOURCES[kind].format(name)).decode()
+        except urllib.error.HTTPError:
+            continue
+        vb, attrs, inner = parse_svg(raw)
+        return vb, 'stroke="currentColor"' in attrs, inner
+    raise FileNotFoundError(f"Ningún icono disponible para {refs}")
+
+
+@lru_cache
+def badge_image(url: str | None) -> tuple[bytes, str] | None:
+    if not url:
+        return None
+    try:
+        data = fetch(url)
+    except (urllib.error.URLError, TimeoutError) as exc:
+        print(f"aviso: sin insignia {url} ({exc}); se usa el icono", file=sys.stderr)
+        return None
+    mime = "image/png" if data.startswith(b"\x89PNG") else "image/jpeg" if data.startswith(b"\xff\xd8") else None
+    return (data, mime) if mime else None
 
 
 class Canvas:
@@ -146,18 +203,31 @@ class Canvas:
     def text(self, x: float, cy: float, s: str, face: Face, size: float, fill: str,
              anchor: str = "start", tracking: float = 0.0) -> None:
         self.glyphs[face] += s
+        _, _, upm, cap = metrics(face)
         ls = f' letter-spacing="{tracking * size:.2f}"' if tracking else ""
-        self.add(f'<text x="{x:.1f}" y="{cy + cap_offset(face, size):.1f}" font-family="{face.css_family}" '
+        self.add(f'<text x="{x:.1f}" y="{cy + cap * size / upm / 2:.1f}" font-family="{face.css_family}" '
                  f'font-weight="{face.weight}" font-size="{size}" fill="{fill}" text-anchor="{anchor}"{ls}>{escape(s)}</text>')
 
-    def pill(self, x: float, y: float, s: str, face: Face, size: float, pad: float, height: float,
-             fill: str, ink: str, stroke: str | None = None) -> float:
-        w = text_width(face, s, size) + 2 * pad
-        border = f' stroke="{stroke}" stroke-width="1.5"' if stroke else ""
+    def icon(self, refs: str, x: float, y: float, size: float, color: str) -> None:
+        vb, stroked, inner = icon(refs)
+        paint = ('fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+                 if stroked else 'fill="currentColor"')
+        self.add(f'<g color="{color}" {paint} transform="translate({x:.2f} {y:.2f}) '
+                 f'scale({size / max(vb[2], vb[3]):.4f}) translate({-vb[0]:g} {-vb[1]:g})">{inner}</g>')
+
+    def pill(self, x: float, y: float, label: str, face: Face, size: float, pad: float, height: float,
+             fill: str, ink: str, refs: str | None = None, icon_size: float = 0, gap: float = 0,
+             stroke: str | None = None) -> float:
+        w = pill_width(label, face, size, pad, refs, icon_size, gap)
         inset = 0.75 if stroke else 0
-        self.add(f'<rect x="{x + inset:.1f}" y="{y + inset:.1f}" width="{w - 2 * inset:.1f}" height="{height - 2 * inset:.1f}" '
-                 f'rx="{height / 2 - inset:.1f}" fill="{fill}"{border}/>')
-        self.text(x + w / 2, y + height / 2, s, face, size, ink, anchor="middle")
+        border = f' stroke="{stroke}" stroke-width="1.5"' if stroke else ""
+        self.add(f'<rect x="{x + inset:.1f}" y="{y + inset:.1f}" width="{w - 2 * inset:.1f}" '
+                 f'height="{height - 2 * inset:.1f}" rx="{height / 2 - inset:.1f}" fill="{fill}"{border}/>')
+        tx = x + pad
+        if refs:
+            self.icon(refs, tx, y + (height - icon_size) / 2, icon_size, ink)
+            tx += icon_size + gap
+        self.text(tx, y + height / 2, label, face, size, ink)
         return w
 
     def save(self, path: Path) -> None:
@@ -170,23 +240,53 @@ class Canvas:
         )
 
 
-def chip_row(items: list[str], pastel: str | None, t: dict, size=13, pad=12, height=30, gap=8, face=MONO_500):
-    widths = [text_width(face, s, size) + 2 * pad for s in items]
-    c = Canvas(sum(widths) + gap * (len(items) - 1), height, ", ".join(items))
+def pill_width(label: str, face: Face, size: float, pad: float, refs: str | None, icon_size: float, gap: float) -> float:
+    return text_width(face, label, size) + 2 * pad + (icon_size + gap if refs else 0)
+
+
+CHIP = dict(face=MONO_500, size=13, pad=12, icon_size=14, gap=6)
+
+
+def chip_row(items: list[tuple[str, str]], pastel: str | None, t: dict, height: float = 30, spacing: float = 8) -> Canvas:
+    widths = [pill_width(label, refs=refs, **CHIP) for label, refs in items]
+    c = Canvas(sum(widths) + spacing * (len(items) - 1), height, ", ".join(label for label, _ in items))
     x = 0.0
-    for s in items:
-        x += c.pill(x, 0, s, face, size, pad, height, PASTEL[pastel] if pastel else t["raised"],
-                    ABYSS if pastel else t["ink"]) + gap
+    for label, refs in items:
+        x += c.pill(x, 0, label, fill=PASTEL[pastel] if pastel else t["raised"],
+                    ink=ABYSS if pastel else t["ink"], refs=refs, height=height, **CHIP) + spacing
     return c
 
 
-def button(label: str, primary: bool, t: dict):
-    size, pad, height = 14, 24, 42
-    c = Canvas(text_width(SANS_600, label, size) + 2 * pad, height, label)
+def button(label: str, refs: str, primary: bool, t: dict) -> Canvas:
+    spec = dict(face=SANS_600, size=14, pad=24, icon_size=16, gap=8)
+    c = Canvas(pill_width(label, refs=refs, **spec), 42, label)
     if primary:
-        c.pill(0, 0, label, SANS_600, size, pad, height, PASTEL["mint"], ABYSS)
+        c.pill(0, 0, label, fill=PASTEL["mint"], ink=ABYSS, refs=refs, height=42, **spec)
     else:
-        c.pill(0, 0, label, SANS_600, size, pad, height, "none", t["ink"], stroke=t["line_strong"])
+        c.pill(0, 0, label, fill="none", ink=t["ink"], refs=refs, height=42, stroke=t["line_strong"], **spec)
+    return c
+
+
+def cert_lines(cert: dict) -> list[tuple[str, Face, float, str]]:
+    lines = [(cert["title"], SANS_600, 16, "ink"), (cert["issuer"], SANS_400, 13, "muted")]
+    return lines + ([("Ver credencial →", SANS_600, 13, "accent")] if cert["url"] else [])
+
+
+def cert_card(cert: dict, t: dict, width: float) -> Canvas:
+    H, media, pad = 96, 56, 20
+    c = Canvas(width, H, f"{cert['title']}, {cert['issuer']}")
+    c.add(f'<rect x=".5" y=".5" width="{width - 1:.1f}" height="{H - 1}" rx="15.5" fill="{t["surface"]}" stroke="{t["line"]}"/>')
+    if img := badge_image(cert["badge"]):
+        data, mime = img
+        c.add(f'<image x="{pad}" y="{pad}" width="{media}" height="{media}" '
+              f'href="data:{mime};base64,{base64.b64encode(data).decode()}"/>')
+    else:
+        c.add(f'<circle cx="{pad + media / 2}" cy="{pad + media / 2}" r="{media / 2}" fill="{PASTEL[cert["pastel"]]}"/>')
+        c.icon(cert["icon"], pad + media / 4, pad + media / 4, media / 2, ABYSS)
+    lines = cert_lines(cert)
+    top = H / 2 - (len(lines) - 1) * 11
+    for i, (s, face, size, role) in enumerate(lines):
+        c.text(pad + media + 16, top + i * 22, s, face, size, t[role])
     return c
 
 
@@ -204,7 +304,7 @@ def ridges(width: int, height: int, fill: str, seed: int = 7) -> str:
 
 
 def header(t: dict) -> Canvas:
-    W, H, pad = 1280, 360, 64
+    W, H, pad = 1280, 400, 64
     c = Canvas(W, H, f"{PROFILE['greeting']}. {PROFILE['title']}.")
     c.defs.append(f'<clipPath id="card"><rect width="{W}" height="{H}" rx="24"/></clipPath>'
                   f'<pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">'
@@ -212,25 +312,26 @@ def header(t: dict) -> Canvas:
     c.add(f'<g clip-path="url(#card)"><rect width="{W}" height="{H}" fill="{t["bg"]}"/>'
           f'<rect width="{W}" height="{H}" fill="url(#dots)"/>{ridges(W, H, t["bg"])}</g>'
           f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="23.5" fill="none" stroke="{t["line"]}"/>')
-    tx, logo = pad, ASSETS / t["logo"]
-    if logo.exists():
-        png = logo.read_bytes()
-        lw, lh = struct.unpack(">II", png[16:24])
-        h = 150
-        w = h * lw / lh
-        c.add(f'<image x="{pad}" y="62" width="{w:.1f}" height="{h}" '
-              f'href="data:image/png;base64,{base64.b64encode(png).decode()}"/>')
-        tx = pad + w + 44
+    tx = pad
+    if LOGO.exists():
+        vb, _, inner = parse_svg(LOGO.read_text("utf-8"))
+        lh = 208
+        lw = lh * vb[2] / vb[3]
+        c.add(f'<svg x="{pad}" y="64" width="{lw:.1f}" height="{lh}" viewBox="{" ".join(f"{v:g}" for v in vb)}" '
+              f'color="{t["logo"]}" overflow="visible">{inner}</svg>')
+        tx = pad + lw + 48
     c.text(tx, 84, PROFILE["title"].upper(), MONO_500, 20, t["overline"], tracking=.1)
-    c.text(tx, 146, PROFILE["greeting"], DISPLAY, 72, t["ink"], tracking=-.02)
+    c.text(tx, 148, PROFILE["greeting"], DISPLAY, 72, t["ink"], tracking=-.02)
+    c.text(tx, 204, PROFILE["tagline"], SANS_400, 20, t["muted"])
     x = tx
-    for label, pastel in PROFILE["chips"]:
-        x += c.pill(x, 196, label, MONO_500, 19, 18, 44, PASTEL[pastel], ABYSS) + 12
+    for label, pastel, refs in PROFILE["pillars"]:
+        x += c.pill(x, 232, label, MONO_500, 18, 16, 44, PASTEL[pastel], ABYSS, refs=refs, icon_size=20, gap=8) + 12
     return c
 
 
 def slug(s: str) -> str:
-    return "".join(ch if ch.isalnum() else "-" for ch in s.lower().translate(str.maketrans("áéíóú", "aeiou"))).strip("-")
+    return re.sub(r"-+", "-", "".join(ch if ch.isalnum() else "-" for ch in
+                                      s.lower().translate(str.maketrans("áéíóúñ", "aeioun")))).strip("-")
 
 
 def picture(stem: str, alt: str, width: str | None = None) -> str:
@@ -239,39 +340,50 @@ def picture(stem: str, alt: str, width: str | None = None) -> str:
             f'<img src="assets/{stem}-light.svg" alt={quoteattr(alt)}{w}></picture>')
 
 
+def linked(url: str | None, html: str) -> str:
+    return f'<a href="{url}">{html}</a>' if url else html
+
+
 def main() -> None:
     ASSETS.mkdir(exist_ok=True)
+    card_w = max(20 + 56 + 16 + max(text_width(f, s, z) for s, f, z, _ in cert_lines(cert)) + 24 for cert in CERTS)
     for theme, t in THEMES.items():
         header(t).save(ASSETS / f"header-{theme}.svg")
         for title, pastel, items in STACK:
             chip_row(items, pastel, t).save(ASSETS / f"stack-{slug(title)}-{theme}.svg")
-        for i, (label, _) in enumerate(CONTACT):
-            button(label, i == 0, t).save(ASSETS / f"contact-{slug(label)}-{theme}.svg")
+        for cert in CERTS:
+            cert_card(cert, t, card_w).save(ASSETS / f"cert-{cert['slug']}-{theme}.svg")
+        for i, (label, _, refs) in enumerate(CONTACT):
+            button(label, refs, i == 0, t).save(ASSETS / f"contact-{slug(label)}-{theme}.svg")
 
-    certs = "\n".join(f"- [{n}]({u})" if u else f"- {n}" for n, u in CERTS)
-    stack = "\n\n".join(f"**{title}**<br>\n{picture(f'stack-{slug(title)}', ', '.join(items))}" for title, _, items in STACK)
-    contact = "\n".join(f'<a href="{u}">{picture(f"contact-{slug(label)}", label)}</a>' for label, u in CONTACT)
-    readme = f"""{picture("header", f"{PROFILE['greeting']} — {PROFILE['title']}", "100%")}
+    about = "\n".join(f"- {line}" for line in ABOUT)
+    projects = "" if not PROJECTS else "## Proyectos destacados\n\n" + "\n".join(f"- **{f'[{name}]({url})' if url else name}**. {desc}" for name, url, desc in PROJECTS) + "\n\n"
+    stack = "\n\n".join(f"**{title}**<br>\n{picture(f'stack-{slug(title)}', ', '.join(l for l, _ in items))}"
+                        for title, _, items in STACK)
+    certs = "\n".join(linked(c["url"], picture(f"cert-{c['slug']}", f"{c['title']}, {c['issuer']}")) for c in CERTS)
+    contact = "\n".join(linked(url, picture(f"contact-{slug(label)}", label)) for label, url, _ in CONTACT)
+    (ROOT / "README.md").write_text(f"""{picture("header", f"{PROFILE['greeting']}. {PROFILE['title']}.", "100%")}
 
 ## Sobre mí
 
-{chr(10).join(f"- {line}" for line in ABOUT)}
+{about}
 
-## Stack y herramientas
+{projects}## Stack y herramientas
 
 {stack}
 
 ## Certificaciones
 
+<p>
 {certs}
+</p>
 
 ## Contacto
 
 <p>
 {contact}
 </p>
-"""
-    (ROOT / "README.md").write_text(readme, encoding="utf-8")
+""", encoding="utf-8")
 
 
 if __name__ == "__main__":

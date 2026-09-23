@@ -9,7 +9,7 @@
 ## Stack y herramientas
 
 **Lenguajes**<br>
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-lenguajes-dark.svg"><img src="assets/stack-lenguajes-light.svg" alt="Python, SQL, R"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-lenguajes-dark.svg"><img src="assets/stack-lenguajes-light.svg" alt="Python, R, SQL, SAS"></picture>
 
 **IA generativa**<br>
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-ia-generativa-dark.svg"><img src="assets/stack-ia-generativa-light.svg" alt="MCP, Ollama, n8n, FAISS, ChromaDB"></picture>
@@ -21,16 +21,16 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-datos-e-integracion-dark.svg"><img src="assets/stack-datos-e-integracion-light.svg" alt="PostgreSQL, BigQuery, NetSuite, Salesforce, pandas"></picture>
 
 **BI y visualización**<br>
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-bi-y-visualizacion-dark.svg"><img src="assets/stack-bi-y-visualizacion-light.svg" alt="Power BI, Tableau, Looker Studio, Plotly"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-bi-y-visualizacion-dark.svg"><img src="assets/stack-bi-y-visualizacion-light.svg" alt="Power BI, Tableau, Plotly"></picture>
 
 **Infraestructura**<br>
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-infraestructura-dark.svg"><img src="assets/stack-infraestructura-light.svg" alt="Docker, Git, Linux"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-infraestructura-dark.svg"><img src="assets/stack-infraestructura-light.svg" alt="Linux, Docker, Git"></picture>
 
 ## Certificaciones
 
 <p>
 <a href="https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/cert-dp-900-dark.svg"><img src="assets/cert-dp-900-light.svg" alt="Azure Data Fundamentals, Microsoft · DP-900"></picture></a>
-<picture><source media="(prefers-color-scheme: dark)" srcset="assets/cert-hackerrank-sql-dark.svg"><img src="assets/cert-hackerrank-sql-light.svg" alt="SQL (Advanced), HackerRank"></picture>
+<a href="https://www.hackerrank.com/certificates/f3d20ca33ed3"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/cert-hackerrank-sql-dark.svg"><img src="assets/cert-hackerrank-sql-light.svg" alt="SQL (Advanced), HackerRank"></picture></a>
 </p>
 
 ## Contacto

@@ -27,6 +27,7 @@ LOGO = ASSETS / "da-logo.svg"
 SOURCES = {
     "font": "https://raw.githubusercontent.com/google/fonts/main/ofl/{}",
     "si": "https://cdn.jsdelivr.net/npm/simple-icons@16.32.0/icons/{}.svg",
+    "si11": "https://cdn.jsdelivr.net/npm/simple-icons@11.15.0/icons/{}.svg",
     "lu": "https://cdn.jsdelivr.net/npm/lucide-static@1.47.0/icons/{}.svg",
 }
 
@@ -61,29 +62,29 @@ ABOUT = [
 ]
 PROJECTS: list[tuple[str, str | None, str]] = []
 STACK = [
-    ("Lenguajes", "mint", [("Python", "si:python"), ("SQL", "lu:database"), ("R", "si:r")]),
+    ("Lenguajes", "mint", [("Python", "si:python"), ("R", "si:r"), ("SQL", "lu:database"), ("SAS", "lu:chart-scatter")]),
     ("IA generativa", "lavender", [("MCP", "si:modelcontextprotocol"), ("Ollama", "si:ollama"), ("n8n", "si:n8n"),
                                    ("FAISS", "lu:scan-search"), ("ChromaDB", "lu:database-zap")]),
     ("Machine learning", "lavender", [("PyTorch", "si:pytorch"), ("scikit-learn", "si:scikitlearn"),
                                       ("XGBoost", "lu:trees"), ("Optuna", "si:optuna")]),
     ("Datos e integración", "sky", [("PostgreSQL", "si:postgresql"), ("BigQuery", "si:googlebigquery"),
-                                    ("NetSuite", "lu:building-2"), ("Salesforce", "lu:users"), ("pandas", "si:pandas")]),
-    ("BI y visualización", "peach", [("Power BI", "lu:chart-column"), ("Tableau", "lu:chart-area"),
-                                     ("Looker Studio", "lu:chart-pie"), ("Plotly", "si:plotly")]),
-    ("Infraestructura", None, [("Docker", "si:docker"), ("Git", "si:git"), ("Linux", "si:linux")]),
+                                    ("NetSuite", "lu:building-2"), ("Salesforce", "si11:salesforce"), ("pandas", "si:pandas")]),
+    ("BI y visualización", "peach", [("Power BI", "si11:powerbi"), ("Tableau", "si11:tableau"), ("Plotly", "si:plotly")]),
+    ("Infraestructura", None, [("Linux", "si:linux"), ("Docker", "si:docker"), ("Git", "si:git")]),
 ]
 CERTS = [
     dict(slug="dp-900", title="Azure Data Fundamentals", issuer="Microsoft · DP-900",
          url="https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url",
-         badge="https://images.credly.com/size/110x110/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/"
-               "azure-data-fundamentals-600x600.png",
-         icon="si:credly", pastel="sky"),
-    dict(slug="hackerrank-sql", title="SQL (Advanced)", issuer="HackerRank", url=None, badge=None,
-         icon="si:hackerrank", pastel="mint"),
+         badges=["https://images.credly.com/size/110x110/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/"
+                 "azure-data-fundamentals-600x600.png",
+                 "https://learn.microsoft.com/en-us/media/learn/certification/badges/microsoft-certified-fundamentals-badge.svg"],
+         icon="si11:microsoftazure", pastel="sky"),
+    dict(slug="hackerrank-sql", title="SQL (Advanced)", issuer="HackerRank",
+         url="https://www.hackerrank.com/certificates/f3d20ca33ed3", badges=[], icon="si:hackerrank", pastel="mint"),
 ]
 CONTACT = [
     ("Escribir un correo", "mailto:arteagadavinson@gmail.com", "lu:mail"),
-    ("Ver LinkedIn", "https://linkedin.com/in/davinson-arteaga", "si:linkedin|lu:briefcase-business"),
+    ("Ver LinkedIn", "https://linkedin.com/in/davinson-arteaga", "si11:linkedin"),
     ("Abrir WhatsApp", "https://wa.me/573157032101", "si:whatsapp"),
 ]
 
@@ -112,7 +113,7 @@ def fetch(url: str) -> bytes:
     path = CACHE / hashlib.sha1(url.encode()).hexdigest()[:16]
     if not path.exists():
         CACHE.mkdir(exist_ok=True)
-        req = urllib.request.Request(url, headers={"User-Agent": "build-profile"})
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) build-profile"})
         with urllib.request.urlopen(req, timeout=60) as r:
             path.write_bytes(r.read())
     return path.read_bytes()
@@ -177,17 +178,28 @@ def icon(refs: str) -> tuple[list[float], bool, str]:
     raise FileNotFoundError(f"Ningún icono disponible para {refs}")
 
 
+def badge_mime(data: bytes) -> str | None:
+    if data.startswith(b"\x89PNG"):
+        return "image/png"
+    if data.startswith(b"\xff\xd8"):
+        return "image/jpeg"
+    return "image/svg+xml" if b"<svg" in data[:512] else None
+
+
 @lru_cache
-def badge_image(url: str | None) -> tuple[bytes, str] | None:
-    if not url:
-        return None
-    try:
-        data = fetch(url)
-    except (urllib.error.URLError, TimeoutError) as exc:
-        print(f"aviso: sin insignia {url} ({exc}); se usa el icono", file=sys.stderr)
-        return None
-    mime = "image/png" if data.startswith(b"\x89PNG") else "image/jpeg" if data.startswith(b"\xff\xd8") else None
-    return (data, mime) if mime else None
+def badge_image(slug: str, urls: tuple[str, ...]) -> tuple[bytes, str] | None:
+    for local in sorted((ASSETS / "badges").glob(f"{slug}.*")):
+        if mime := badge_mime(local.read_bytes()):
+            return local.read_bytes(), mime
+    for url in urls:
+        try:
+            data = fetch(url)
+        except (urllib.error.URLError, TimeoutError) as exc:
+            print(f"aviso: sin insignia {url} ({exc})", file=sys.stderr)
+            continue
+        if mime := badge_mime(data):
+            return data, mime
+    return None
 
 
 class Canvas:
@@ -276,7 +288,7 @@ def cert_card(cert: dict, t: dict, width: float) -> Canvas:
     H, media, pad = 96, 56, 20
     c = Canvas(width, H, f"{cert['title']}, {cert['issuer']}")
     c.add(f'<rect x=".5" y=".5" width="{width - 1:.1f}" height="{H - 1}" rx="15.5" fill="{t["surface"]}" stroke="{t["line"]}"/>')
-    if img := badge_image(cert["badge"]):
+    if img := badge_image(cert["slug"], tuple(cert["badges"])):
         data, mime = img
         c.add(f'<image x="{pad}" y="{pad}" width="{media}" height="{media}" '
               f'href="data:{mime};base64,{base64.b64encode(data).decode()}"/>')

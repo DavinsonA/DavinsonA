@@ -1,73 +1,38 @@
-<h1 align="center">Hola, soy Davinson</h1>
-<p align="center">Estadístico · Data Analyst · Data Scientist</p>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg"><img src="assets/header-light.svg" alt="Hola, soy Davinson — Data Scientist · AI Engineer" width="100%"></picture>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Cali-Colombia-FFCD00?style=flat-square" alt="ubicación" />
-  <img src="https://img.shields.io/badge/MSc%20Data%20Science-ICESI-5454e9?style=flat-square" alt="maestría" />
-</p>
+## Sobre mí
 
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=0:003B49,100:99DED7&section=header" width="100%" />
+- Estadístico de la Universidad del Valle; curso la Maestría en Ciencia de Datos en la Universidad ICESI.
+- Construyo consultas SQL avanzadas, conciliaciones financieras y pipelines de reportes automatizados sobre NetSuite (SuiteQL).
+- Desarrollo agentes de IA con tool use, MCP servers y RAG.
+- Hago consultoría independiente en análisis estadístico, BI y visualización, y modelado.
 
-### Sobre mí
+## Stack y herramientas
 
-- Cursando **Maestría en Ciencia de Datos** — Universidad ICESI
-- Estadístico de la Universidad del Valle, basado en Cali, Colombia
-- Consultoría independiente en análisis estadístico, BI/visualización y modelado
-- Aprendiendo el ecosistema de IA: agentes, tool use, MCP servers
+**Lenguajes**<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-lenguajes-dark.svg"><img src="assets/stack-lenguajes-light.svg" alt="Python, R, SQL, SAS"></picture>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=0:003B49,100:99DED7&section=header" width="100%" />
+**IA y machine learning**<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-ia-y-machine-learning-dark.svg"><img src="assets/stack-ia-y-machine-learning-light.svg" alt="PyTorch, scikit-learn, Optuna"></picture>
 
-### Stack & herramientas
+**Datos y plataformas**<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-datos-y-plataformas-dark.svg"><img src="assets/stack-datos-y-plataformas-light.svg" alt="pandas, NumPy, PostgreSQL, NetSuite"></picture>
 
-**Lenguajes**
+**BI y visualización**<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-bi-y-visualizacion-dark.svg"><img src="assets/stack-bi-y-visualizacion-light.svg" alt="Power BI, Tableau, Plotly"></picture>
 
-![R](https://img.shields.io/badge/R-276DC3?style=flat&logo=r&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat&logo=postgresql&logoColor=white)
-![SAS](https://img.shields.io/badge/SAS-0766D1?style=flat&logo=sas&logoColor=white)
+**Infraestructura**<br>
+<picture><source media="(prefers-color-scheme: dark)" srcset="assets/stack-infraestructura-dark.svg"><img src="assets/stack-infraestructura-light.svg" alt="Linux, Docker, Git"></picture>
 
-**Data Science & ML**
+## Certificaciones
 
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=pytorch&logoColor=white)
-![pandas](https://img.shields.io/badge/pandas-150458?style=flat&logo=pandas&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)
-![Optuna](https://img.shields.io/badge/Optuna-3860A8?style=flat&logo=optuna&logoColor=white)
+- [Microsoft Certified: Azure Data Fundamentals (DP-900)](https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url)
+- HackerRank: SQL (Advanced)
 
-**BI & Visualización**
+## Contacto
 
-![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
-![Tableau](https://img.shields.io/badge/Tableau-E97627?style=flat&logo=tableau&logoColor=white)
-![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=flat&logo=plotly&logoColor=white)
-
-**Infra & herramientas**
-
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=0:003B49,100:99DED7&section=header" width="100%" />
-
-### Certificaciones
-
-<p align="left">
-  <a href="https://www.credly.com/badges/dd83bed0-88a8-4cc8-bdea-702b794d8e25/public_url">
-    <img src="https://images.credly.com/size/80x80/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/azure-data-fundamentals-600x600.png" alt="DP-900" />
-  </a>
- </p>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=0:003B49,100:99DED7&section=header" width="100%" />
-
-### Contacto
-
-<p align="center">
-  <a href="https://wa.me/573157032101">
-    <img src="https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
-  </a>
-  <a href="mailto:arteagadavinson@gmail.com">
-    <img src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" />
-  </a>
-  <a href="https://linkedin.com/in/davinson-arteaga">
-    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
-  </a>
+<p>
+<a href="mailto:arteagadavinson@gmail.com"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact-escribir-un-correo-dark.svg"><img src="assets/contact-escribir-un-correo-light.svg" alt="Escribir un correo"></picture></a>
+<a href="https://linkedin.com/in/davinson-arteaga"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact-ver-linkedin-dark.svg"><img src="assets/contact-ver-linkedin-light.svg" alt="Ver LinkedIn"></picture></a>
+<a href="https://wa.me/573157032101"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/contact-abrir-whatsapp-dark.svg"><img src="assets/contact-abrir-whatsapp-light.svg" alt="Abrir WhatsApp"></picture></a>
 </p>
